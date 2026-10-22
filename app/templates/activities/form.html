@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if activity else 'Nueva' }}{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <h2>{{ 'Editar actividad' if activity else 'Nueva actividad' }}</h2>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <label>Practicante</label>
+    <select name="intern_id" required>
+      {% for i in interns %}
+        <option value="{{ i.id }}" {{ 'selected' if activity and activity.intern_id==i.id }}>{{ i.full_name }}</option>
+      {% endfor %}
+    </select>
+
+    <div class="two">
+      <div>
+        <label>Fecha</label>
+        <input type="date" name="activity_date" required
+               value="{{ activity.activity_date if activity else '' }}">
+      </div>
+      <div>
+        <label>Categoría</label>
+        <select name="category_id">
+          <option value="">—</option>
+          {% for c in categories %}
+            <option value="{{ c.id }}" {{ 'selected' if activity and activity.category_id==c.id }}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <label>Actividad</label>
+    <input name="title" maxlength="180" required value="{{ activity.title if activity else '' }}">
+
+    <div class="two">
+      <div><label>Hora inicio</label>
+        <input type="time" name="start_time" value="{{ activity.start_time.strftime('%H:%M') if activity and activity.start_time else '' }}"></div>
+      <div><label>Hora fin</label>
+        <input type="time" name="end_time" value="{{ activity.end_time.strftime('%H:%M') if activity and activity.end_time else '' }}"></div>
+    </div>
+
+    <label>Horas (si no usas horario)</label>
+    <input type="number" name="hours" step="0.25" min="0" max="24"
+           value="{{ activity.hours if activity else 0 }}">
+
+    <label>Descripción</label>
+    <textarea name="description">{{ activity.description if activity else '' }}</textarea>
+
+    <label>Observaciones</label>
+    <textarea name="observations">{{ activity.observations if activity else '' }}</textarea>
+
+    {% if current_user.is_admin %}
+    <label>Estado</label>
+    <select name="status">
+      {% for s in statuses %}
+        <option value="{{ s }}" {{ 'selected' if activity and activity.status==s }}>{{ s }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+
+    <div class="row">
+      <button class="btn" type="submit">Guardar</button>
+      <a class="btn ghost" href="{{ url_for('activities.index') }}">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

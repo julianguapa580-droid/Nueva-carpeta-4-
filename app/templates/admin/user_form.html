@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Usuario{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <h2>{{ 'Editar usuario' if user else 'Nuevo usuario' }}</h2>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Usuario</label>
+    <input name="username" required value="{{ user.username if user else '' }}">
+    <label>Nombre completo</label>
+    <input name="full_name" required value="{{ user.full_name if user else '' }}">
+    <label>Correo</label>
+    <input type="email" name="email" value="{{ user.email if user and user.email else '' }}">
+    <label>Rol</label>
+    <select name="role">
+      {% for r in roles %}
+        <option value="{{ r }}" {{ 'selected' if user and user.role==r }}>{{ r }}</option>
+      {% endfor %}
+    </select>
+    <label>{{ 'Nueva contraseña (opcional)' if user else 'Contraseña (se genera si se deja vacía)' }}</label>
+    <input type="password" name="password" minlength="10">
+    {% if user %}
+    <label class="check"><input type="checkbox" name="active" {{ 'checked' if user.active }}> Cuenta activa</label>
+    {% endif %}
+    <button class="btn" type="submit">Guardar</button>
+    <a class="btn ghost" href="{{ url_for('admin.users') }}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

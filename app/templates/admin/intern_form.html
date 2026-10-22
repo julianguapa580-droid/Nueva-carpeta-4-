@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Practicante{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <h2>{{ 'Editar' if intern else 'Nuevo' }} practicante</h2>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Nombre completo</label>
+    <input name="full_name" required value="{{ intern.full_name if intern else '' }}">
+    <div class="two">
+      <div><label>DNI</label><input name="dni" value="{{ intern.dni if intern else '' }}"></div>
+      <div><label>Carrera</label><input name="career" value="{{ intern.career if intern else '' }}"></div>
+    </div>
+    <label>Institución</label>
+    <input name="institution" value="{{ intern.institution if intern else '' }}">
+    <label>Área asignada</label>
+    <input name="area" value="{{ intern.area if intern else '' }}">
+
+    <label>Cuenta de usuario vinculada</label>
+    <select name="user_id">
+      <option value="">— Sin cuenta —</option>
+      {% for u in free_users %}
+        <option value="{{ u.id }}" {{ 'selected' if intern and intern.user_id==u.id }}>{{ u.username }} — {{ u.full_name }}</option>
+      {% endfor %}
+    </select>
+
+    {% if not current_user.is_supervisor %}
+    <label>Supervisor</label>
+    <select name="supervisor_id">
+      <option value="">—</option>
+      {% for s in supervisors %}
+        <option value="{{ s.id }}" {{ 'selected' if intern and intern.supervisor_id==s.id }}>{{ s.full_name }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+
+    <div class="two">
+      <div><label>Inicio</label><input type="date" name="start_date" value="{{ intern.start_date if intern and intern.start_date else '' }}"></div>
+      <div><label>Fin</label><input type="date" name="end_date" value="{{ intern.end_date if intern and intern.end_date else '' }}"></div>
+    </div>
+
+    <label>Meta de horas</label>
+    <input type="number" name="target_hours" min="1" value="{{ intern.target_hours if intern else 400 }}">
+
+    <label class="check"><input type="checkbox" name="active" {{ 'checked' if not intern or intern.active }}> Activo</label>
+
+    <button class="btn" type="submit">Guardar</button>
+    <a class="btn ghost" href="{{ url_for('admin.interns') }}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

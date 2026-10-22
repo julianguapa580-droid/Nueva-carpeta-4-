@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Ingresar{% endblock %}
+{% block content %}
+<div class="card login">
+  <h1>Iniciar sesión</h1>
+  <p class="muted">Acceso restringido al personal autorizado.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Usuario</label>
+    <input name="username" required autofocus autocomplete="username">
+    <label>Contraseña</label>
+    <input name="password" type="password" required autocomplete="current-password">
+    <button class="btn block" type="submit">Ingresar</button>
+  </form>
+</div>
+{% endblock %}

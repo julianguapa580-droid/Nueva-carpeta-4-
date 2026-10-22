@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Reportes{% endblock %}
+{% block content %}
+<div class="row between no-print">
+  <h1>Reportes</h1>
+  <div class="row">
+    <a class="btn" href="{{ url_for('reports.pdf_export', intern_id=request.args.get('intern_id')) }}">PDF</a>
+    <a class="btn ghost" href="{{ url_for('reports.csv_export', intern_id=request.args.get('intern_id')) }}">CSV</a>
+    <button class="btn ghost" onclick="window.print()">Imprimir</button>
+  </div>
+</div>
+
+<form class="card filters no-print" method="get">
+  <select name="intern_id">
+    <option value="">Todos</option>
+    {% for i in interns %}
+      <option value="{{ i.id }}" {{ 'selected' if intern and intern.id==i.id }}>{{ i.full_name }}</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    <option value="">Todos los estados</option>
+    {% for s in ['Pendiente','Aprobada','Rechazada'] %}
+      <option value="{{ s }}" {{ 'selected' if status==s }}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn" type="submit">Aplicar</button>
+</form>
+
+<div class="card print-area">
+  <h2 style="text-align:center">{{ municipality }}</h2>
+  <p style="text-align:center" class="muted">{{ area }}</p>
+  <hr>
+  <p><b>Practicante:</b> {{ intern.full_name if intern else 'Todos' }} &nbsp;
+     <b>Emitido:</b> {{ today.strftime('%d/%m/%Y') }}</p>
+  <p><b>Total registros:</b> {{ totals.count }} &nbsp;
+     <b>Horas aprobadas:</b> {{ totals.approved }} h</p>
+
+  <table>
+    <thead><tr><th>Fecha</th><th>Actividad</th><th>Categoría</th><th>Horas</th><th>Estado</th></tr></thead>
+    <tbody>
+    {% for a in activities %}
+      <tr>
+        <td>{{ a.activity_date.strftime('%d/%m/%Y') }}</td>
+        <td>{{ a.title }}</td>
+        <td>{{ a.category.name if a.category else '—' }}</td>
+        <td>{{ a.hours|round(2) }}</td>
+        <td>{{ a.status }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">Sin registros.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if footer %}<p class="muted">{{ footer }}</p>{% endif %}
+
+  <div class="signatures">
+    <div>_____________________________<br>Supervisor / Responsable</div>
+    <div>_____________________________<br>Jefe de Área</div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Auditoría{% endblock %}
+{% block content %}
+<h1>Auditoría</h1>
+<div class="card">
+  <table>
+    <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>Detalle</th><th>IP</th></tr></thead>
+    <tbody>
+    {% for l in pagination.items %}
+      <tr>
+        <td class="muted">{{ l.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+        <td>{{ l.username }}</td>
+        <td><span class="badge">{{ l.action }}</span></td>
+        <td>{{ l.entity or '—' }}{{ ' #' ~ l.entity_id if l.entity_id }}</td>
+        <td class="muted">{{ l.detail or '' }}</td>
+        <td class="muted">{{ l.ip or '' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

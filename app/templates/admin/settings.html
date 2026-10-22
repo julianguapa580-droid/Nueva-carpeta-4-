@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Configuración{% endblock %}
+{% block content %}
+<h1>Configuración</h1>
+
+<div class="card">
+  <h3>Datos institucionales</h3>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Municipalidad</label>
+    <input name="municipality" value="{{ data.municipality }}">
+    <label>Área</label>
+    <input name="area" value="{{ data.area }}">
+    <label>Pie de página de reportes</label>
+    <input name="report_footer" value="{{ data.report_footer }}">
+    <label>Meta de horas por defecto</label>
+    <input type="number" name="default_target_hours" min="1" value="{{ data.default_target_hours }}">
+    <button class="btn" type="submit">Guardar</button>
+    <a class="btn ghost" href="{{ url_for('admin.backup') }}">Descargar respaldo JSON</a>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Categorías</h3>
+  <table>
+    <tbody>
+    {% for c in categories %}
+      <tr>
+        <td><span class="dot" style="background:{{ c.color }}"></span> {{ c.name }}</td>
+        <td class="right">
+          <form method="post" action="{{ url_for('admin.category_delete', cat_id=c.id) }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn danger sm" type="submit">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <form method="post" action="{{ url_for('admin.category_create') }}" class="filters">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input name="name" placeholder="Nueva categoría" required>
+    <input type="color" name="color" value="#1769aa">
+    <button class="btn" type="submit">Añadir</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<div class="row between">
+  <h1>Usuarios</h1>
+  <a class="btn" href="{{ url_for('admin.user_form') }}">+ Nuevo usuario</a>
+</div>
+
+<form class="card filters" method="get">
+  <input name="q" value="{{ q }}" placeholder="Buscar usuario…">
+  <button class="btn" type="submit">Buscar</button>
+</form>
+
+<div class="card">
+  <table>
+    <thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Último acceso</th><th></th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u.username }}</td>
+        <td>{{ u.full_name }}</td>
+        <td><span class="badge">{{ u.role }}</span></td>
+        <td>{{ 'Activo' if u.active else 'Inactivo' }}</td>
+        <td class="muted">{{ u.last_login_at.strftime('%d/%m/%Y %H:%M') if u.last_login_at else '—' }}</td>
+        <td class="actions">
+          <a class="btn ghost sm" href="{{ url_for('admin.user_form', user_id=u.id) }}">Editar</a>
+          <form method="post" action="{{ url_for('admin.user_reset', user_id=u.id) }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn sm" type="submit">Reset pwd</button>
+          </form>
+          <form method="post" action="{{ url_for('admin.user_toggle', user_id=u.id) }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn ghost sm" type="submit">{{ 'Desactivar' if u.active else 'Activar' }}</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Actividades{% endblock %}
+{% block content %}
+<h1>Actividades</h1>
+
+<form class="card filters" method="get">
+  <input name="q" value="{{ q }}" placeholder="Buscar…">
+  <select name="status">
+    <option value="">Todos los estados</option>
+    {% for s in statuses %}
+      <option value="{{ s }}" {{ 'selected' if s==status }}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <select name="category">
+    <option value="">Todas las categorías</option>
+    {% for c in categories %}
+      <option value="{{ c.id }}" {{ 'selected' if c.id==cat }}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+  <input type="date" name="from" value="{{ df }}">
+  <input type="date" name="to" value="{{ dt }}">
+  <button class="btn" type="submit">Filtrar</button>
+  <a class="btn ghost" href="{{ url_for('activities.index') }}">Limpiar</a>
+</form>
+
+{% if not current_user.is_supervisor %}
+<p><a class="btn" href="{{ url_for('activities.create') }}">+ Registrar actividad</a></p>
+{% endif %}
+
+<div class="card">
+  <table>
+    <thead><tr>
+      <th>Fecha</th><th>Actividad</th><th>Practicante</th>
+      <th>Categoría</th><th>Horas</th><th>Estado</th><th></th>
+    </tr></thead>
+    <tbody>
+    {% for a in pagination.items %}
+      <tr>
+        <td>{{ a.activity_date.strftime('%d/%m/%Y') }}</td>
+        <td><a href="{{ url_for('activities.detail', activity_id=a.id) }}">{{ a.title }}</a></td>
+        <td>{{ a.intern.full_name }}</td>
+        <td>{{ a.category.name if a.category else '—' }}</td>
+        <td>{{ a.hours|round(2) }}</td>
+        <td><span class="pill {{ a.status|lower }}">{{ a.status }}</span></td>
+        <td class="actions">
+          {% if current_user.is_admin or (current_user.is_intern and a.status != 'Aprobada') %}
+            <a class="btn ghost sm" href="{{ url_for('activities.edit', activity_id=a.id) }}">Editar</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="muted">No hay registros con estos filtros.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if pagination.pages > 1 %}
+<div class="pagination">
+  {% for p in pagination.iter_pages(left_edge=1, right_edge=1) %}
+    {% if p %}
+      <a class="{{ 'active' if p==pagination.page }}"
+         href="{{ url_for('activities.index', page=p, q=q, status=status, category=cat, from=df, to=dt) }}">{{ p }}</a>
+    {% else %}<span>…</span>{% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

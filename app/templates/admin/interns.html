@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Practicantes{% endblock %}
+{% block content %}
+<div class="row between">
+  <h1>Practicantes</h1>
+  <a class="btn" href="{{ url_for('admin.intern_form') }}">+ Nuevo</a>
+</div>
+<div class="card">
+  <table>
+    <thead><tr><th>Nombre</th><th>Área</th><th>Supervisor</th><th>Horas</th><th>Progreso</th><th></th></tr></thead>
+    <tbody>
+    {% for i in interns %}
+      <tr>
+        <td>{{ i.full_name }}</td>
+        <td>{{ i.area or '—' }}</td>
+        <td>{{ i.supervisor.full_name if i.supervisor else '—' }}</td>
+        <td>{{ i.approved_hours|round(1) }} / {{ i.target_hours|round(0) }}</td>
+        <td style="min-width:140px">
+          <div class="progress"><div style="width: {{ i.progress }}%"></div></div>
+          <small class="muted">{{ i.progress }}%</small>
+        </td>
+        <td><a class="btn ghost sm" href="{{ url_for('admin.intern_form', intern_id=i.id) }}">Editar</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

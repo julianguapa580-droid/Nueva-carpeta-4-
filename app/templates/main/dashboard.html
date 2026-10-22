@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Panel{% endblock %}
+{% block content %}
+<h1>Panel de avance</h1>
+
+<div class="grid">
+  <div class="metric"><span>Actividades</span><strong>{{ total }}</strong></div>
+  <div class="metric"><span>Aprobadas</span><strong>{{ approved }}</strong></div>
+  <div class="metric"><span>Pendientes</span><strong>{{ pending }}</strong></div>
+  <div class="metric"><span>Horas aprobadas</span><strong>{{ hours }} h</strong></div>
+</div>
+
+<div class="card">
+  <div class="row between">
+    <h3>Progreso general</h3>
+    <span class="muted">Meta: {{ target|round(0) }} h</span>
+  </div>
+  <div class="progress big"><div style="width: {{ pct }}%"></div></div>
+  <p class="muted">{{ pct }}% completado</p>
+</div>
+
+<div class="card">
+  <h3>Horas aprobadas por mes</h3>
+  <div class="chart">
+    {% for m in monthly %}
+      <div class="bar">
+        <div class="bar-fill" style="height: {{ (m.hours / max_h * 100)|round(0) }}%"></div>
+        <span>{{ m.hours }}</span>
+        <small>{{ m.label }}</small>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="row between">
+    <h3>Últimas actividades</h3>
+    <a class="btn sm" href="{{ url_for('activities.create') }}">+ Nueva</a>
+  </div>
+  <table>
+    <thead><tr><th>Fecha</th><th>Actividad</th><th>Practicante</th><th>Estado</th><th>Horas</th></tr></thead>
+    <tbody>
+    {% for a in recent %}
+      <tr>
+        <td>{{ a.activity_date.strftime('%d/%m/%Y') }}</td>
+        <td>{{ a.title }}</td>
+        <td>{{ a.intern.full_name }}</td>
+        <td><span class="pill {{ a.status|lower }}">{{ a.status }}</span></td>
+        <td>{{ a.hours|round(2) }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">Sin registros.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Detalle{% endblock %}
+{% block content %}
+<div class="card narrow">
+  <h2>{{ activity.title }}</h2>
+  <p class="muted">{{ activity.intern.full_name }} · {{ activity.activity_date.strftime('%d/%m/%Y') }}</p>
+  <p><span class="pill {{ activity.status|lower }}">{{ activity.status }}</span></p>
+
+  <dl class="detail">
+    <dt>Horas</dt><dd>{{ activity.hours|round(2) }}</dd>
+    <dt>Categoría</dt><dd>{{ activity.category.name if activity.category else '—' }}</dd>
+    <dt>Descripción</dt><dd>{{ activity.description or '—' }}</dd>
+    <dt>Observaciones</dt><dd>{{ activity.observations or '—' }}</dd>
+    {% if activity.reviewer %}
+      <dt>Revisado por</dt><dd>{{ activity.reviewer.full_name }}</dd>
+      <dt>Nota de revisión</dt><dd>{{ activity.review_note or '—' }}</dd>
+    {% endif %}
+  </dl>
+
+  {% if current_user.role in ('admin','supervisor') and activity.status == 'Pendiente' %}
+  <form method="post" action="{{ url_for('activities.review', activity_id=activity.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Nota (opcional)</label>
+    <textarea name="review_note"></textarea>
+    <div class="row">
+      <button class="btn ok" name="decision" value="Aprobada">Aprobar</button>
+      <button class="btn danger" name="decision" value="Rechazada">Rechazar</button>
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}
